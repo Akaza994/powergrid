@@ -25,7 +25,18 @@ model=SRNN()
 
 Build model by passing the graph information. Edge RNNs and Node RNNs are generated in this step
 
-model.build_model()
+model.build_model(samples,predictions,num_units,cell_type,hidden_size,num_layers)
+
+   sample: input_dim for each node
+   predictions: output_dim for each node
+   
+   num_units: a list of length 3 that contains the hidden_size of each three-cell-stacked Edge RNN.
+   
+   cell_type: cell type of each Edge RNN. Options: 'Plain', 'momentum', 'Adam'. Use pytorch built-in LSTM cell if is 'Plain'. For details of other two options: https://arxiv.org/abs/2006.06919   
+   
+   hiddn_size: hidden_size for each Node RNN
+   
+   num_layers: num_layer for each Node RNN
 
 Suppose we have N data points each node for training. This model offers two training startegies: 
  1. Joint train all nodes in the same class each time. Loop through all classes and data:
