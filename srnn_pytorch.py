@@ -30,12 +30,12 @@ class RNN(nn.Module):
             self.lstm2=nn.LSTMCell(num_units[0],num_units[1])
             self.lstm3=nn.LSTMCell(num_units[1],num_units[2])
         if cell_type=='momentum':
-            self.lstm2=MomentumLSTMCell(self.num_units[0],self.num_units[1],mu=0.5,epsilon=0.5)
-            self.lstm3=MomentumLSTMCell(num_units[1],num_units[2],mu=0.5,epsilon=0.5)
+            self.lstm2=MomentumLSTMCell(self.num_units[0],self.num_units[1],mu=0.5,epsilon=0.5,squeeze=False)
+            self.lstm3=MomentumLSTMCell(num_units[1],num_units[2],mu=0.5,epsilon=0.5,squeeze=False)
         if cell_type=='Adam':
-            self.lstm2=AdamLSTMCell(self.num_units[0],self.num_units[1],mu=0.9,epsilon=0.1,mus=0.9)
+            self.lstm2=AdamLSTMCell(self.num_units[0],self.num_units[1],mu=0.9,epsilon=0.1,mus=0.9,squeeze=False)
             #self.lstm2=MomentumLSTMCell(self.num_units[0],self.num_units[1],mu=0.8,epsilon=0.2)
-            self.lstm3=AdamLSTMCell(num_units[1],num_units[2],mu=0.9,epsilon=0.1,mus=0.9)
+            self.lstm3=AdamLSTMCell(num_units[1],num_units[2],mu=0.9,epsilon=0.1,mus=0.9,squeeze=False)
         self.linear=nn.Linear(num_units[-1],self.output_dim)
         
     def forward(self,input):
@@ -191,6 +191,16 @@ class SRNN(nn.Module):
             if epoch%50==0:
                 print('loss: ',total_loss/len(X_train.keys()))
     def per_node_joint_train(self,X_train,Y_train,Epoch,milestones=None):
+        '''Function to train all nodes
+        
+        arg:
+            X_train: a nested dictionary of training data
+                     X_train[node][edge] has shape n by m, where n is the # of
+                     data points and m is the length of observations in each data point
+            Y_train: a nested dictionary of training target
+                     Y_train[node] has shape n by p, where p is the length of predictions
+            
+            '''
         for epoch in range(Epoch):
             total_loss=0.0
             for cl in self.cls_list:
@@ -221,7 +231,13 @@ class SRNN(nn.Module):
                         scheduler.step()
             if epoch%50==0:
                 print('loss: ',total_loss/len(self.node_to_type.keys()))
-    def per_node_eval(self,X_test,Y_test):
+    def per_node_eval(self,X_test,Y_test=None):
+        '''function to predict testing data
+        
+        arg:
+            X_test: a nested dictionary of testing data
+            Y_test: optional, labels for testing data
+        '''
         criterion=torch.nn.MSELoss()
         Y_pred={}
         errors={}
@@ -240,7 +256,8 @@ class SRNN(nn.Module):
                 edge_outputs+=[output.unsqueeze(1)]
             X=torch.cat(edge_outputs,1)
             y_pred=self.NodeRNNs[cl](X)
-            loss=criterion(y_pred,Y)
+            if not Y_test is None:
+                loss=criterion(y_pred,Y)
             errors[node]=loss.data
             total_loss+=loss
             Y_pred[node]=y_pred.data.numpy()
