@@ -61,7 +61,7 @@ def load_graph_and_normalize(fpath, threshold=0.025, symmetrize=True, exclude_se
     return graph
 
 
-# Xiyang: Modify to one node RNN per US State.
+
 def partition_to_one_node_per_state(fpath):
     df = pd.read_csv(fpath, header = None)
     States = range(df.shape[1])
