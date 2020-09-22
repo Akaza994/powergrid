@@ -14,11 +14,8 @@ from sklearn.cluster import KMeans
 import tensorflow as tf
 from torch.autograd import Variable
 import torch
-#DATA_DIR = '../Data'
-file_num1=[71,72,73,74,75]
-suffix1='a1a16.mat'
-file_num2=[186,187,188,189,190]
-suffix2='a1a39.mat'
+
+
 
 def partition_to_three_parts(fpath):
     df = pd.read_csv(fpath, header = None)
