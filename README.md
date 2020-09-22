@@ -37,7 +37,7 @@ model.build_model(samples,predictions,num_units,cell_type,hidden_size,num_layers
 
 Suppose we have N data points each node for training. This model offers two training startegies: 
  1. Joint train all nodes in the same class each time. Loop through all classes and data:
-    # model.joint_train(self,X_train,Y_train,Epoch,cl,milestones)
+    -model.joint_train(self,X_train,Y_train,Epoch,cl,milestones)
        inputs: 
        
          cl: class number
@@ -50,7 +50,7 @@ Suppose we have N data points each node for training. This model offers two trai
                   
          milestone: a scheduler will be defined for adaptive learning rate if a list is inputed
  2. Train each node one by one while the same node in each class share the same Edge RNNs and Node RNN:
-    # model.per_node_joint_train(X_train,Y_train,Epoch,milestones)
+    -model.per_node_joint_train(X_train,Y_train,Epoch,milestones)
       inputs:
       
          X_train: a dict that contains features of each node.
